@@ -1,6 +1,5 @@
 ## Usage
-Deploy the app:
->>>>>>> a97045a (Publish link to the latest docker build)
+
 ```
 kubectl apply -f  https://raw.githubusercontent.com/isimluk/vulnapp/master/vulnerable.example.yaml
 ```
