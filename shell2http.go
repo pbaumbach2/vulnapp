@@ -51,10 +51,12 @@ const indexTmpl = `<!DOCTYPE html>
 <!-- Served by shell2http/%s -->
 <html>
 <head>
-    <title>❯ shell2http</title>
+    <title>❯ CrowdStrike's VulnApp</title>
+	<link rel="icon" href="/images/logo.png">
     <style>
     body {
         font-family: sans-serif;
+		background-color: #17161a;
     }
     li {
         list-style-type: none;
@@ -63,15 +65,54 @@ const indexTmpl = `<!DOCTYPE html>
         content: "❯";
         padding-right: 5px;
     }
+	h1, h2, h3  {
+		color: #fff;
+		opacity: 0.87;
+	}
+	p {
+		color: #fff;
+		opacity: 0.75;
+	}
+	.links, a {
+		color: #fff;
+	};
+	.hero {
+		margin: auto;
+		width: 100%%;
+		flex-shrink: 1;
+	}
+	.welcome {
+		margin: auto;
+		max-width: 600px;
+	}
+	.container {
+		display: flex;
+		flex-direction: row;
+		flex-grow: 1;
+		flex-wrap: wrap;
+		background-color: #000;
     </style>
 </head>
+<header>
+    <div class="header" style="display: flex; flex-direction: row; align-items: center;">
+        <img class="logo" style="height: 75%%; padding-top: 8px" src="images/logo_crowdstrike.png">
+	    <span class="separator" style="color: #fff; padding: 10px;"> | </span>
+	    <h2>VulnApp</h2>
+    </div>
+</header>
 <body>
-	<h1>Welcome to vulnerable.example.com</h1>
+    <div class="container">
+	    <div class="welcome">
+	        <h1>Welcome to vulnerable.example.com</h1>
 
-        <p>This web application runs on Kubernetes cluster under <a href="https://github.com/CrowdStrike/Cloud-AWS/tree/master/Container Security">Falcon Container Runtime Protection</a>.</p>
-        <p>This web application allows you to execute various exploitation techniques as if it was an attacker exploiting the application. Falcon Container sensor running inside the pod will then recognise this malicious behaviour and report it back to the Falcon Console.</p>
+            <p>This web application runs on a Kubernetes cluster utilizing CrowdStrke's Falcon sensor running via DaemonSet or as a Sidecar.</p>
+            <p>The web application will allow you to execute various exploitation techniques as if it was an attacker exploiting the application. The Falcon sensor will recognize this malicious behavior and report it back to the Falcon Console.</p>
 
-        <p>You can view output of <a href="/ps">ps command</a> to see that falcon-sensor container running within the same pod as this application.</p>
+            <p>You can view output of <a class="links" href="/ps">ps command</a> to see view process running within the same pod as this application.</p>
+	    </div>
+        <img class="hero" src="images/hero-homepage.png">
+    </div>
+	<h3>Detections</h3>
 	<ul>
 		%s
 	</ul>
@@ -271,16 +312,17 @@ func execShellCommand(appConfig Config, shell string, params []string, req *http
 }
 
 var cmdDescriptions = map[string]string{
-	"./bin/Defense_Evasion_via_Rootkit.sh": "This script will change the group owner of /etc/ld.so.preload to 0, indicative of a Jynx Rootkit.",
-	"./bin/Defense_Evasion_via_Masquerading.sh": "Creates a copy of /usr/bin/whoami to whoami.rtf and executes it, causing a contradicting file extension.",
+	"./bin/Defense_Evasion_via_Rootkit.sh":                             "This script will change the group owner of /etc/ld.so.preload to 0, indicative of a Jynx Rootkit.",
+	"./bin/Defense_Evasion_via_Masquerading.sh":                        "Creates a copy of /usr/bin/whoami to whoami.rtf and executes it, causing a contradicting file extension.",
 	"./bin/Exfiltration_via_Exfiltration_Over_Alternative_Protocol.sh": "Attempts to exfiltrate data using DNS dig requests that contain system data in the hostname.",
-	"./bin/Command_Control_via_Remote_Access.sh": "Attempts to connect to a remote IP address and will exit at fork. Falcon Prevent will kill the attempt.",
-	"./bin/Command_Control_via_Remote_Access-obfuscated.sh": "Attempts to connect to a remote IP address and will exit at fork. Falcon Prevent will kill the attempt. (obfuscated version)",
-	"./bin/Credential_Access_via_Credential_Dumping.sh": "Runs mimipenguin and tries to dump passwords from inside the container environment.",
-	"./bin/Collection_via_Automated_Collection.sh": "Attempts to dump credentials from /etc/passwd to /tmp/passwords.",
-	"./bin/Execution_via_Command-Line_Interface.sh": "Emulate malicious activity related to suspicious CLI commands. Runs the command sh -c whoami '[S];pwd;echo [E]'.",
-	"./bin/Malware_Linux_Trojan_Local.sh": "Attempts to execute malware pre-loaded into the container. A Falcon Prevent policy will kill the process, if Falcon Prevent is enabled.",
-	"./bin/Malware_Linux_Trojan_Remote.sh": "Downloads malware from a remote target and attempts to execute it. A Falcon Prevent policy will kill the process, if Falcon Prevent is enabled.",
+	"./bin/Command_Control_via_Remote_Access.sh":                       "Attempts to connect to a remote IP address and will exit at fork. Falcon Prevent will kill the attempt.",
+	"./bin/Command_Control_via_Remote_Access-obfuscated.sh":            "Attempts to connect to a remote IP address and will exit at fork. Falcon Prevent will kill the attempt. (obfuscated version)",
+	"./bin/Credential_Access_via_Credential_Dumping.sh":                "Runs mimipenguin and tries to dump passwords from inside the container environment.",
+	"./bin/Collection_via_Automated_Collection.sh":                     "Attempts to dump credentials from /etc/passwd to /tmp/passwords.",
+	"./bin/Execution_via_Command-Line_Interface.sh":                    "Emulate malicious activity related to suspicious CLI commands. Runs the command sh -c whoami '[S];pwd;echo [E]'.",
+	"./bin/Malware_Linux_Trojan_Local.sh":                              "Attempts to execute malware pre-loaded into the container. A Falcon Prevent policy will kill the process, if Falcon Prevent is enabled.",
+	"./bin/Malware_Linux_Trojan_Remote.sh":                             "Downloads malware from a remote target and attempts to execute it. A Falcon Prevent policy will kill the process, if Falcon Prevent is enabled.",
+	"./bin/ContainerDrift_Via_File_Creation_and_Execution.sh":          "Container Drift via file creation script. Creating a file and then executing it.",
 }
 
 func describeCmd(cmd string) string {
@@ -635,6 +677,8 @@ func main() {
 		http.HandleFunc(handler.path, handlerFunc)
 		log.Printf("register: %s (%s)\n", handler.path, handler.cmd)
 	}
+	fs := http.FileServer(http.Dir("/images"))
+	http.Handle("/images/", http.StripPrefix("/images/", fs))
 
 	listener, err := net.Listen("tcp", net.JoinHostPort(appConfig.host, strconv.Itoa(appConfig.port)))
 	if err != nil {

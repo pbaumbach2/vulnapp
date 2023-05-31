@@ -15,7 +15,8 @@ RUN go build -v -trimpath -ldflags="-w -s -X 'main.version=$(git describe --abbr
 FROM quay.io/crowdstrike/detection-container
 
 COPY entrypoint.sh /
-COPY --from=go_builder /go/bin/shell2http /shell2http
+COPY images /images
+COPY --from=builder /go/bin/shell2http /shell2http
 
 EXPOSE 8080
 

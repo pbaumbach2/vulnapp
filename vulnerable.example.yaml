@@ -16,8 +16,8 @@ spec:
         run: vulnerable.example.com
     spec:
       containers:
-          - name: app
-            image: quay.io/slukasik/vulnapp
+          - name: vulnapp
+            image: quay.io/crowdstrike/vulnapp
             imagePullPolicy: Always
             command:
               - "/entrypoint.sh"
