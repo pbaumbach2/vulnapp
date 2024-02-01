@@ -25,7 +25,7 @@ kubectl delete -f  https://raw.githubusercontent.com/crowdstrike/vulnapp/main/vu
 
 ## Usage - OpenShift
 
-The OpenShift-specific deployment uses a `Route` with automatic edge TLS termination, and takes advantage of the Topology view's app grouping.
+The OpenShift-specific deployment uses a `Route` with automatic edge TLS termination, configures a ServiceAccount and RoleBinding to run the app as UID 0, and takes advantage of the Topology view's app grouping.
 
 ### Web console
 
@@ -36,7 +36,7 @@ The OpenShift-specific deployment uses a `Route` with automatic edge TLS termina
 
 To open the webpage, return to the Topology view click the URL link on the deployment icon.
 
-To delete the app, click the kebab menu on the `vulnapp` application, then **Delete Application**.
+To delete the app, click the kebab menu on the `vulnapp` application, then **Delete Application**. You'll have to manually delete the `vulnapp` ServiceAccount and `vulnapp-anyuid` RoleBinding.
 
 ### Command line
 
