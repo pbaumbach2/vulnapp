@@ -4,16 +4,16 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: vulnerable.example.com
+  name: vulnerable-example
 spec:
   selector:
    matchLabels:
-      run: vulnerable.example.com
+      run: vulnerable-example
   replicas: 1
   template:
     metadata:
       labels:
-        run: vulnerable.example.com
+        run: vulnerable-example
     spec:
       containers:
           - name: vulnapp
@@ -32,8 +32,8 @@ metadata:
   name: vulnerable-example-com
 spec:
   selector:
-    run: vulnerable.example.com
+    run: vulnerable-example
   ports:
     - port: 80
       targetPort: 8080
-  type: LoadBalancer
+  type: NodePort
